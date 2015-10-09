@@ -5,41 +5,75 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private int currentRating = 0;
+    private int currentPosRating = 0;
+    private int currentNegRating = 0;
+    private int ratingUpdateFreq = 3; //Updateringsfrekvens rating
+    private int timesRated = 0;
+    private int minTimesRated = 5; // Minsta antal gånger man blivit ratead för att se rating
+    ProgressBar progressBar;
+    Button yesButton;
+    Button noButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+
         ImageView bildView = (ImageView)findViewById(R.id.headView);
-        bildView.setImageResource(R.drawable.utmakelse3);
+        bildView.setImageResource(R.drawable.shower_head_text);
 
-        ImageView achBack = (ImageView)findViewById(R.id.achBack);
-        achBack.setImageResource(R.drawable.achback);
+        yesButton = (Button)findViewById(R.id.yesButton);
+        yesButton.setOnClickListener(
+                new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        //SEND incrementRating();to other user
+                        //yesButton.setEnabled(false);
 
-        ImageView achFront = (ImageView)findViewById(R.id.achFront);
-        achFront.setImageResource(R.drawable.achfront);
+                        //test
+                        //incPosRating();
+                        //updateProgressBar();
+                    }
+                }
+        );
+        yesButton.setEnabled(false);
 
-        ImageView knapp = (ImageView)findViewById(R.id.knapp);
-        knapp.setImageResource(R.drawable.knapp2);
-        //ImageButton imageButton = (ImageButton)findViewById(R.id.imgButton);
-        //imageButton.setImageResource(R.drawable.knapp);
+        noButton = (Button)findViewById(R.id.noButton);
+        noButton.setOnClickListener(
+                new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        //SEND decrementRating(); to other user
 
-        //Referens till knappen
-       // Button nrButton = (Button)findViewById(R.id.nrbutton);
-        // Sätter upp listener med inbyggd händelse
-        //nrButton.setOnClickListener(
-        //        new Button.OnClickListener() {
-        //            public void onClick(View v) { //Vad som skall hända vid klick
-        //                TextView numberView = (TextView) findViewById(R.id.nrTextView);
-        //                numberView.setText(getPhoneNumber());
-        //            }
-        //        }
-        //);
+                        //test
+                        incNegRating();
+                        //updateProgressBar();
+                    }
+                }
+        );
+
+       Button closeButton = (Button)findViewById(R.id.showerCloseButton);
+        closeButton.setOnClickListener(
+                new Button.OnClickListener() {
+                    public void onClick(View v) { //Vad som skall hända vid klick
+                        finish();
+                        //TextView numberView = (TextView) findViewById(R.id.nrTextView);
+                        //numberView.setText(getPhoneNumber());
+                    }
+                }
+        );
+
+
 
 
     }
@@ -66,14 +100,36 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public String getPhoneNumber() {
-        TelephonyManager tm = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
-        String phoneNumber = tm.getLine1Number(); // Return null if it is unavailable.
 
-        if (phoneNumber == null) {
-            return "Number unavailable";
+    public void enableRatingButtons(){
+        yesButton.setEnabled(true);
+        noButton.setEnabled(true);
+    }
+    public void disableRatingButtons(){
+        yesButton.setEnabled(false);
+        noButton.setEnabled(false);
+    }
+
+    public void updateRatingBar(){
+
+        int posRating = currentPosRating;
+        int negRating = currentNegRating;
+        int timesRated = posRating+negRating; //Gör en timesRated i Stats
+        float posPercent = 0;
+
+           posPercent = (float)posRating/timesRated*100;
+
+        if(timesRated % ratingUpdateFreq == 0){ //just show new rating every X time
+            //set progressbar to currentRaing/timesRated
+            progressBar.setProgress((int)posPercent);
         }
 
-        return phoneNumber;
     }
+    public void incrementRating(){currentRating++;}
+    public void decrementRating(){currentRating--;}
+    public void incrementTimesRated(){timesRated++;}
+
+    public void incPosRating(){currentPosRating++;}
+    public void incNegRating(){currentNegRating++;}
+
 }
